@@ -47,7 +47,8 @@ def forceshutdown(selector):
 
 
 def confirmation_window(pc_name):
-    conflayout = [[sg.Text('Are you sure you want to FORCE SHUT-DOWN ' + pc_name + '?')],
+    conflayout = [[sg.T('Are you sure you want to FORCE SHUT-DOWN'),
+                   sg.T(pc_name, text_color='red', pad=(0, 3)), sg.T('?', pad=(0, 3))],
                   [sg.OK(button_color=('white', 'red')), sg.Cancel(button_color=('white', 'green'))]]
 
     confevent, confvalues = sg.Window('Are you sure?', conflayout).read(close=True)
