@@ -59,23 +59,23 @@ sg.theme('Default1')
 layout = [[sg.Text('Welcome to Booty-Python!')],
           [sg.Text('Running on port ' + str(PORT) + '@' + IP)],
           [sg.Text('Select the PC\'s you want to turn on below:')],
-          [sg.Checkbox(key='-PC01P-', text='PC-01')],
-          [sg.Checkbox(key='-PC02P-', text='PC-02')],
-          [sg.Checkbox(key='-PC03P-', text='PC-03')],
-          [sg.Checkbox(key='-PC04P-', text='PC-04')],
-          [sg.Checkbox(key='-PC05P-', text='PC-05')],
-          [sg.Checkbox(key='-PC06P-', text='PC-06')],
-          [sg.Checkbox(key='-PC07P-', text='PC-07')],
-          [sg.Checkbox(key='-PC08P-', text='PC-08')],
+          [sg.Checkbox(key='-PC01P-', text='', size=(0, 0)), sg.Text('Henk')],
+          [sg.Checkbox(key='-PC02P-', text='', size=(0, 0)), sg.Text('NDI Pro 1')],
+          [sg.Checkbox(key='-PC03P-', text='', size=(0, 0)), sg.Text('NDI Pro 2')],
+          [sg.Checkbox(key='-PC04P-', text='', size=(0, 0)), sg.Text('NDI Rec')],
+          [sg.Checkbox(key='-PC05P-', text='', size=(0, 0)), sg.Text('Regie')],
+          [sg.Checkbox(key='-PC06P-', text='', size=(0, 0)), sg.Text('Storage')],
+          [sg.Checkbox(key='-PC07P-', text='', size=(0, 0)), sg.Text('Videoserver')],
+          [sg.Checkbox(key='-PC08P-', text='', size=(0, 0)), sg.Text('PC-08')],
           [sg.Button(button_text='Turn on PC'), sg.Button(button_text='Quit Booty-Python', key='-QUIT-')],
           [sg.T()],
           [sg.Text('Select a PC to force shut-down below:')],
           [sg.Text(' BE CAREFUL!', text_color='red')],
-          [sg.Combo(['', 'PC-01', 'PC-02', 'PC-03', 'PC-04', 'PC-05', 'PC-06', 'PC-07', 'PC-08'],
+          [sg.Combo(['', 'Henk', 'NDI Pro 1', 'NDI Pro 2', 'NDI Rec', 'Regie', 'Storage', 'Videoserver', 'PC-08'],
                     default_value='', readonly=True, key='-PCDROP-'),
            sg.Button(button_text='Force Shut-down PC', button_color=('white', 'red'), key='-FORCESD-')],
           [sg.T()],
-          [sg.Text('Version: GPIO 0.95')],
+          [sg.Text('Version: GPIO 0.98')],
           [sg.Text('By Céderic van Rossum for LVC')]]
 
 if mode == 'TKT':  # if using PySimpleGUI(Qt) then don't use web_ip etc. params
@@ -109,19 +109,19 @@ while True:
         if values['-PCDROP-'] != '':
             # if sg.popup_ok_cancel('Are you sure you want to FORCE SHUT-DOWN ' + values['-PCDROP-'] + '?') == 'OK':
             if confirmation_window(values['-PCDROP-']) == 'OK':
-                if values['-PCDROP-'] == 'PC-01':
+                if values['-PCDROP-'] == 'Henk':
                     forceshutdown(r1)
-                if values['-PCDROP-'] == 'PC-02':
+                if values['-PCDROP-'] == 'NDI Pro 1':
                     forceshutdown(r2)
-                if values['-PCDROP-'] == 'PC-03':
+                if values['-PCDROP-'] == 'NDI Pro 2':
                     forceshutdown(r3)
-                if values['-PCDROP-'] == 'PC-04':
+                if values['-PCDROP-'] == 'NDI Rec':
                     forceshutdown(r4)
-                if values['-PCDROP-'] == 'PC-05':
+                if values['-PCDROP-'] == 'Regie':
                     forceshutdown(r5)
-                if values['-PCDROP-'] == 'PC-06':
+                if values['-PCDROP-'] == 'Storage':
                     forceshutdown(r6)
-                if values['-PCDROP-'] == 'PC-07':
+                if values['-PCDROP-'] == 'Videoserver':
                     forceshutdown(r7)
                 if values['-PCDROP-'] == 'PC-08':
                     forceshutdown(r8)
