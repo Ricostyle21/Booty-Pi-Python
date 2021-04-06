@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 import RPi.GPIO as GPIO
-import PySimpleGUIWeb as sg
+import PySimpleGUIWebAuth as sg
 import threading
 
 mode = 'WEB'  # WEB or TKT
 IP = '192.168.178.106'
 PORT = 8069
+username = 'test'  # if you leave either one blank no authentication will be required
+password = 'test'
 
 r1 = 3
 r2 = 5
@@ -68,7 +70,7 @@ layout = [[sg.Text('Welcome to Booty-Python!')],
           [sg.Checkbox(key='-PC06P-', text='', size=(0, 0)), sg.Text('Storage')],
           [sg.Checkbox(key='-PC07P-', text='', size=(0, 0)), sg.Text('Videoserver')],
           [sg.Checkbox(key='-PC08P-', text='', size=(0, 0)), sg.Text('PC-08')],
-          [sg.Button(button_text='Turn on PC'), sg.Button(button_text='Quit Booty-Python', key='-QUIT-')],
+          [sg.Button(button_text='Turn on PC')],
           [sg.T()],
           [sg.Text('Select a PC to force shut-down below:')],
           [sg.Text(' BE CAREFUL!', text_color='red')],
@@ -76,13 +78,15 @@ layout = [[sg.Text('Welcome to Booty-Python!')],
                     default_value='', readonly=True, key='-PCDROP-'),
            sg.Button(button_text='Force Shut-down PC', button_color=('white', 'red'), key='-FORCESD-')],
           [sg.T()],
-          [sg.Text('Version: GPIO 0.98')],
-          [sg.Text('By Céderic van Rossum for LVC')]]
+          [sg.Text('Version: GPIO 0.99')],
+          [sg.Text('By Céderic van Rossum for LVC')],
+          [sg.Button(button_text='Quit Booty-Python', key='-QUIT-')]]
 
 if mode == 'TKT':  # if using PySimpleGUI(Qt) then don't use web_ip etc. params
     window = sg.Window('Booty-Pi', layout)
 else:
-    window = sg.Window('Booty-Pi', layout, web_ip=IP, web_port=PORT, web_start_browser=False, disable_close=True)
+    window = sg.Window('Booty-Pi', layout, web_ip=IP, web_port=PORT, web_start_browser=False, disable_close=True,
+                       httpusername=username, httppassword=password)
 
 while True:
     event, values = window.read()
@@ -130,5 +134,5 @@ while True:
 window.close()
 
 # TODO turn into module for function use
-# TODO remove quit button
+# TODO remove quit button (I moved it)
 # TODO add status indicators (maybe with pinging?)
