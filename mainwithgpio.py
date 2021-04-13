@@ -57,6 +57,19 @@ def confirmation_window(pc_name):
     return confevent
 
 
+def confirmation_quit():
+    conflayout = [[sg.T('Are you sure you want to '),
+                   sg.T('QUIT BOOTY-PYTHON', text_color='red', pad=(0, 3)), sg.T('?', pad=(0, 3))],
+                  [sg.InputText(focus=True, default_text='Type LVC_YES to continue', key='-TEXT-')],
+                  [sg.OK(button_color=('white', 'red')), sg.Cancel(button_color=('white', 'green'))]]
+
+    confevent, confvalues = sg.Window('Are you sure?', conflayout).read(close=True)
+    if confevent == 'OK' and confvalues['-TEXT-'] == 'LVC_YES':
+        return confevent
+    elif confevent == 'OK' and confvalues['-TEXT-'] != 'LVC_YES':
+        sg.PopupError('Wrong terminate phrase, not quitting.')
+
+
 sg.theme('Default1')
 
 layout = [[sg.Text('Welcome to Booty-Python!')],
@@ -78,9 +91,10 @@ layout = [[sg.Text('Welcome to Booty-Python!')],
                     default_value='', readonly=True, key='-PCDROP-'),
            sg.Button(button_text='Force Shut-down PC', button_color=('white', 'red'), key='-FORCESD-')],
           [sg.T()],
-          [sg.Text('Version: GPIO 0.99')],
+          [sg.Text('Version: GPIO 1.00')],
           [sg.Text('By Céderic van Rossum for LVC')],
-          [sg.Button(button_text='Quit Booty-Python', key='-QUIT-')]]
+          [sg.Button(button_text='Quit Booty-Python', key='-QUIT-')],
+          [sg.Image(r'.\LVC.png', size=(150, 150))]]
 
 if mode == 'TKT':  # if using PySimpleGUI(Qt) then don't use web_ip etc. params
     window = sg.Window('Booty-Pi', layout)
@@ -90,7 +104,11 @@ else:
 
 while True:
     event, values = window.read()
-    if event == '-QUIT-' or event == sg.WIN_CLOSED or event == 'None':
+    if event == '-QUIT-':
+        if confirmation_quit() == 'OK':
+            GPIO.cleanup()
+            break
+    if event == sg.WIN_CLOSED or event == 'None':
         GPIO.cleanup()
         break
     if event is 'Turn on PC':
