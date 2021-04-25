@@ -152,5 +152,4 @@ while True:
 window.close()
 
 # TODO turn into module for function use
-# TODO remove quit button (I moved it)
 # TODO add status indicators (maybe with pinging?)
