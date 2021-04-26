@@ -11,24 +11,24 @@ PORT = 8069
 username = 'test'  # if you leave either one blank no authentication will be required
 password = 'test'
 
-servers = {"Henk": "172.16.0.102",
-           "NDI Pro 1": "192.168.178.120",
-           "NDI Pro 2": "192.168.178.118",
-           "NDI Rec": "192.168.178.11",
-           "Regie": "172.16.0.10",
-           "Storage": "172.16.0.4",
-           "Videoserver": "172.16.0.100",
-           "PC-08": ""
-           }
+r1 = 3  # these are all of the pins the relays are connected to
+r2 = 5
+r3 = 7
+r4 = 8
+r5 = 10
+r6 = 11
+r7 = 12
+r8 = 13
 
-buttons = {"Henk": "Henk",
-           "NDI Pro 1": "NDI Pro 1",
-           "NDI Pro 2": "NDI Pro 2",
-           "NDI Rec": "NDI Rec",
-           "Regie": "Regie",
-           "Storage": "Storage",
-           "Videoserver": "Videoserver",
-           "PC-08": "PC-08"}
+servers = {"Henk": ["172.16.0.102", r6],
+           "NDI Pro 1": ["192.168.178.120", r4],
+           "NDI Pro 2": ["192.168.178.118", r3],
+           "NDI Rec": ["192.168.178.11", r5],
+           "Regie": ["172.16.0.10", r7],
+           "Storage": ["172.16.0.4", r1],
+           "Videoserver": ["172.16.0.100", r2],
+           "PC-08": ["", r8]
+           }
 
 
 def turnon(selector):
@@ -81,7 +81,7 @@ layout = [[sg.Text('Welcome to Booty-Python!')],
           [sg.Checkbox(key='PC-08', text='', size=(0, 0)), sg.Text('PC-08', key='PC-08Status', text_color='red')],
           [sg.Button(button_text='Turn on Server'), sg.Button(button_text='Ping Servers'),
            sg.Text(key='-STATUSLINE-', text='', size=(33, 1), text_color='darkgreen')],
-          [sg.T('(If the checkbox turned off the server has (probably) been turned on.)')],
+          [sg.T('(If the checkbox turned off the server was (probably) turned on.)')],
           [sg.T()],
           [sg.Text('Select a server to force shut-down below:')],
           [sg.Text(' BE CAREFUL!', text_color='red')],
@@ -89,7 +89,7 @@ layout = [[sg.Text('Welcome to Booty-Python!')],
                     default_value='', readonly=True, key='-PCDROP-'),
            sg.Button(button_text='Force Shut-down PC', button_color=('white', 'red'), key='-FORCESD-')],
           [sg.T()],
-          [sg.Text('Version: Print/Non-GPIO 1.50')],
+          [sg.Text('Version: Print/Non-GPIO 1.55')],
           [sg.Text('By Céderic van Rossum for LVC')],
           [sg.Button(button_text='Quit Booty-Python', key='-QUIT-')],
           [sg.Image(r'.\LVC.png', size=(150, 150))]]
@@ -102,6 +102,7 @@ else:
 
 while True:
     event, values = window.read()
+
     if event == '-QUIT-':
         if confirmation_quit() == 'OK':
             # GPIO.cleanup()
@@ -109,24 +110,25 @@ while True:
     if event == sg.WIN_CLOSED or event == 'None':
         # GPIO.cleanup()
         break
+
     if event is 'Ping Servers':
         window['-STATUSLINE-'].update('Hold on tight, pinging servers...')
         for server in servers:
-            if os.system('ping -n 1 "' + str(servers[server]) + '" > NUL') == 0:
+            if os.system('ping -n 1 "' + str(servers[server][0]) + '" > NUL') == 0:
                 window[server + 'Status'].update(text_color='green')
                 # print(server + " is on")
             else:
                 window[server + 'Status'].update(text_color='red')
                 # print(server + " is off")
         window['-STATUSLINE-'].update('Last pinged servers at ' + str(datetime.now().strftime('%H:%M:%S on %d-%m-%Y.')))
+
     if event is 'Turn on Server':
-        for button in buttons:
-            if values[button]:
-                turnon(buttons[button])
-            window[button].update(False)
+        for server in servers:
+            if values[server]:
+                turnon(server)
+            window[server].update(False)
     if event is '-FORCESD-':
         if values['-PCDROP-'] != '':
-            # if sg.popup_ok_cancel('Are you sure you want to FORCE SHUT-DOWN ' + values['-PCDROP-'] + '?') == 'OK':
             if confirmation_window(values['-PCDROP-']) == 'OK':
                 forceshutdown(values['-PCDROP-'])
 
