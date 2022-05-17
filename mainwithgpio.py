@@ -13,6 +13,10 @@ PORT = 8069
 username = 'test'  # if you leave either one blank no authentication will be required
 password = 'test'
 
+ipmi_host = 'xxIPxx'
+ipmi_username = 'username'
+ipmi_password = 'password'
+
 r1 = 3  # these are all of the pins the relays are connected to
 r2 = 5
 r3 = 7
@@ -22,14 +26,14 @@ r6 = 11
 r7 = 12
 r8 = 13
 
-servers = {"Henk": ["192.168.1.102", r6],
-           "NDI Pro 1": ["192.168.1.111", r4],
-           "NDI Pro 2": ["192.168.1.112", r3],
-           "NDI Rec": ["192.168.1.110", r5],
-           "Regie": ["192.168.1.101", r7],
-           "Storage": ["192.168.1.103", r1],
-           "Videoserver": ["192.168.1.100", r2],
-           "PC-08": ["", r8]
+servers = {"Henk": ["192.168.216.52", r6],
+           "NDI Pro 1": ["192.168.216.54", r4],
+           "NDI Pro 2": ["192.168.216.55", r3],
+           "NDI Rec": ["192.168.216.53", r5],
+           "Regie": ["192.168.216.51", r7],
+           "Storage": ["192.168.216.57", r1],
+           "Videoserver": ["192.168.216.56", r2],
+           "Helyx": ["192.168.216.58", r8]
            }
 
 GPIO.setmode(GPIO.BOARD)
@@ -85,21 +89,21 @@ layout = [[sg.Text('Welcome to Booty-Python!')],
           [sg.Checkbox(key='Storage', text='', size=(0, 0)), sg.Text('Storage', key='StorageStatus', text_color='red')],
           [sg.Checkbox(key='Videoserver', text='', size=(0, 0)),
            sg.Text('Videoserver', key='VideoserverStatus', text_color='red')],
-          [sg.Checkbox(key='PC-08', text='', size=(0, 0)), sg.Text('PC-08', key='PC-08Status', text_color='red')],
+          [sg.Checkbox(key='Helyx', text='', size=(0, 0)), sg.Text('Helyx', key='HelyxStatus', text_color='red')],
           [sg.Button(button_text='Turn on Server'), sg.Button(button_text='Ping Servers'),
            sg.Text(key='-STATUSLINE-', text='', size=(33, 1), text_color='darkgreen')],
           [sg.T('(If the checkbox turned off the server was (probably) turned on.)')],
           [sg.T()],
           [sg.Text('Select a server to force shut-down below:')],
           [sg.Text(' BE CAREFUL!', text_color='red')],
-          [sg.Combo(['', 'Henk', 'NDI Pro 1', 'NDI Pro 2', 'NDI Rec', 'Regie', 'Storage', 'Videoserver', 'PC-08'],
+          [sg.Combo(['', 'Henk', 'NDI Pro 1', 'NDI Pro 2', 'NDI Rec', 'Regie', 'Storage', 'Videoserver', 'Helyx'],
                     default_value='', readonly=True, key='-PCDROP-'),
            sg.Button(button_text='Force Shut-down PC', button_color=('white', 'red'), key='-FORCESD-')],
           [sg.T()],
-          [sg.Text('Version: GPIO 1.55')],
+          [sg.Text('Version: GPIO 1.6')],
           [sg.Text('By Céderic van Rossum for LVC')],
           [sg.Button(button_text='Quit Booty-Python', key='-QUIT-')],
-          [sg.Image(r'.\LVC.png', size=(150, 150))]]
+          [sg.Image(r'./LVC.png', size=(150, 150))]]
 
 if mode == 'TKT':  # if using PySimpleGUI(Qt) then don't use web_ip etc. params
     window = sg.Window('Booty-Pi', layout)
@@ -130,14 +134,20 @@ while True:
         window['-STATUSLINE-'].update('Last pinged servers at ' + str(datetime.now().strftime('%H:%M:%S on %d-%m-%Y.')))
 
     if event is 'Turn on Server':
-        for server in servers:
-            if values[server]:
-                turnon(servers[server][1])
-            window[server].update(False)
+        if values[server] == 'Helyx':
+            os.system('ipmitool -I lanplus -H {} -U {} -P {} power on'.format(ipmi_host, ipmi_username, ipmi_password))
+        else:
+            for server in servers:
+                if values[server]:
+                    turnon(servers[server][1])
+                window[server].update(False)
     if event is '-FORCESD-':
         if values['-PCDROP-'] != '':
             if confirmation_window(values['-PCDROP-']) == 'OK':
-                forceshutdown(servers[values['-PCDROP-']][1])
+                if values['-PCDROP-'] == 'Helyx':
+                    os.system('ipmitool -I lanplus -H {} -U {} -P {} power off'.format(ipmi_host, ipmi_username, ipmi_password))
+                else:
+                    forceshutdown(servers[values['-PCDROP-']][1])
 
 window.close()
 
