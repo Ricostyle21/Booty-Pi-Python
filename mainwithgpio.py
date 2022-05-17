@@ -134,8 +134,9 @@ while True:
         window['-STATUSLINE-'].update('Last pinged servers at ' + str(datetime.now().strftime('%H:%M:%S on %d-%m-%Y.')))
 
     if event is 'Turn on Server':
-        if values[server] == 'Helyx':
+        if values['Helyx']:
             os.system('ipmitool -I lanplus -H {} -U {} -P {} power on'.format(ipmi_host, ipmi_username, ipmi_password))
+            window['Helyx'].update(False)
         else:
             for server in servers:
                 if values[server]:
